@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Beemnet/internseek/entity"
-	"github.com/Beemnet/internseek/internship"
+	"github.com/WebProgrammingAAiT/intern-seek-web-project/entity"
+	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship"
+
 	"github.com/julienschmidt/httprouter"
 )
 

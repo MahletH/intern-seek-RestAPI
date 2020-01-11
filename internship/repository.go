@@ -1,6 +1,6 @@
 package internship
 
-import "github.com/Beemnet/internseek/entity"
+import "github.com/WebProgrammingAAiT/intern-seek-web-project/entity"
 
 // InternshipRepository specifies Internship related service
 type InternshipRepository interface {

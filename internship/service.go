@@ -1,6 +1,6 @@
 package internship
 
-import "github.com/Beemnet/internseek/entity"
+import "github.com/WebProgrammingAAiT/intern-seek-web-project/entity"
 
 // InternshipService specifies customer comment related service
 type InternshipService interface {

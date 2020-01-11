@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/Beemnet/internseek/entity"
-	"github.com/Beemnet/internseek/internship"
+	"github.com/WebProgrammingAAiT/intern-seek-web-project/entity"
+	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship"
 )
 
 // InternshipService implements menu.CommentService interface
