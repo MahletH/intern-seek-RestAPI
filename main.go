@@ -4,16 +4,17 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/Beemnet/internseek/handler"
-	"github.com/Beemnet/internseek/internship/repository"
-	"github.com/Beemnet/internseek/internship/service"
+	"github.com/WebProgrammingAAiT/intern-seek-web-project/handler"
+	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship/repository"
+	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship/service"
+
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-var tmpl = template.Must(template.ParseGlob("C:/Users/123/go/src/github.com/Beemnet/internseek/ui/templates/*"))
+var tmpl = template.Must(template.ParseGlob("C:/Users/123/go/src/github.com/WebProgrammingAAiT/intern-seek-web-project/ui/templates/*"))
 
 func index(w http.ResponseWriter, r *http.Request) {
 
@@ -28,12 +29,7 @@ func main() {
 	}
 
 	defer dbconn.Close()
-	/*
-		errs := dbconn.CreateTable(&entity.Comment{}, &entity.Role{}).GetErrors()
-		if errs := nil{
-			panic(err)
-		}
-	*/
+
 	internshipRepo := repository.NewInternshipGormRepo(dbconn)
 	internshipSrv := service.NewInternshipService(internshipRepo)
 	internshipHandler := handler.NewInternshipHandler(internshipSrv)
@@ -45,6 +41,8 @@ func main() {
 	http.HandleFunc("/", index)
 	router.GET("/internship/", internshipHandler.GetInternships)
 	router.POST("/internship/", internshipHandler.PostInternship)
+	router.GET("/internship/:id", internshipHandler.GetSingleInternship) //figure out the link the handler handles
+	router.DELETE("/internship/:id", internshipHandler.DeleteInternship)
 
 	http.ListenAndServe("localhost:8181", router)
 

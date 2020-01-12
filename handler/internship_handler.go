@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/WebProgrammingAAiT/intern-seek-web-project/entity"
 	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship"
@@ -45,6 +46,36 @@ func (ih *InternshipHandler) GetInternships(w http.ResponseWriter,
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(output)
 	return
+}
+
+//GetSingleInternship takes id from url and return it
+func (ih *InternshipHandler) GetSingleInternship(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	internship, errs := ih.internshipService.Internship(uint(id))
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	output, err := json.MarshalIndent(internship, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+
 }
 
 /*
@@ -122,5 +153,28 @@ func (ih *InternshipHandler) PostInternship(w http.ResponseWriter, r *http.Reque
 	p := fmt.Sprintf("internship/%d", internship.ID)
 	w.Header().Set("Location", p)
 	w.WriteHeader(http.StatusCreated)
+	return
+}
+
+// DeleteInternship handles DELETE internship/:id
+func (ih *InternshipHandler) DeleteInternship(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	_, errs := ih.internshipService.DeleteInternship(uint(id))
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
 	return
 }

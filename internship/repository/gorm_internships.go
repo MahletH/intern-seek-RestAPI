@@ -39,7 +39,7 @@ func (igr *InternshipGormRepo) Internships() ([]entity.Internship, []error) {
 	return intern, errs
 }
 
-//CompanyInternships returns internships uder a company
+//CompanyInternships returns internships under a company
 func (igr *InternshipGormRepo) CompanyInternships(compID uint) ([]entity.Internship, []error) {
 	return nil, nil
 }
@@ -74,6 +74,9 @@ func (igr *InternshipGormRepo) UpdateInternship(internship *entity.Internship) (
 // DeleteInternship deletes a given internship
 func (igr *InternshipGormRepo) DeleteInternship(id uint) (*entity.Internship, []error) {
 	intern, errs := igr.Internship(id)
+	field := []entity.Fields{}
+
+	errs = igr.conn.Where("internship_id = ?", id).Delete(&field).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
 	}
