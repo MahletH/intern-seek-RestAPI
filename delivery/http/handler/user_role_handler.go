@@ -11,18 +11,17 @@ import (
 	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
 
-type Companyhandler struct {
-	companyService user.CompanyService
-	userService    user.UserService
+type UserRoleHandler struct {
+	companyService user.UserRoleService
 }
 
-func NewCompanyHandler(compSrv user.CompanyService, userSrv user.UserService) *Companyhandler {
+func NewUserRoleHandler(compSrv user.UserRoleService) *UserRoleHandler {
 
-	return &Companyhandler{companyService: compSrv, userService: userSrv}
+	return &UserRoleHandler{companyService: compSrv}
 }
 
 //GetSingleRoles handles GET/v1/admin/roles/:id  requests
-func (ch *Companyhandler) GetSingleCompany(w http.ResponseWriter,
+func (ch *UserRoleHandler) GetSingleUserRole(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -33,7 +32,7 @@ func (ch *Companyhandler) GetSingleCompany(w http.ResponseWriter,
 		return
 	}
 
-	company, errs := ch.companyService.Company(uint(id))
+	userole, errs := ch.companyService.UserRole(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -41,7 +40,7 @@ func (ch *Companyhandler) GetSingleCompany(w http.ResponseWriter,
 		return
 	}
 
-	output, err := json.MarshalIndent(company, "", "\t\t")
+	output, err := json.MarshalIndent(userole, "", "\t\t")
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -56,53 +55,38 @@ func (ch *Companyhandler) GetSingleCompany(w http.ResponseWriter,
 }
 
 //TO DO change ps to not get userid
-func (ch *Companyhandler) PostCompany(w http.ResponseWriter,
+func (ch *UserRoleHandler) PostUserRole(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
-	id, errr := strconv.Atoi(ps.ByName("id"))
+	l := r.ContentLength
+	body := make([]byte, l)
+	r.Body.Read(body)
+	userole := &entity.UserRole{}
 
-	if errr != nil {
+	err := json.Unmarshal(body, userole)
+
+	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
-	user, errs := ch.userService.User(uint(id))
+	userole, errs := ch.companyService.StoreUserRole(userole)
+
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
-	l := r.ContentLength
-	body := make([]byte, l)
-	r.Body.Read(body)
-	company := &entity.CompanyDetail{}
-
-	err := json.Unmarshal(body, company)
-
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-	company.UserID = user.ID
-	company, errs = ch.companyService.StoreCompany(company)
-
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	p := fmt.Sprintf("/v1/admin/company/%d", company.ID)
+	p := fmt.Sprintf("/v1/userrole/%d", userole.UserId)
 	w.Header().Set("Location", p)
 	w.WriteHeader(http.StatusCreated)
 	return
 
 }
 
-func (ch *Companyhandler) DeleteCompany(w http.ResponseWriter,
+func (ch *UserRoleHandler) DeleteUserRole(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -113,7 +97,7 @@ func (ch *Companyhandler) DeleteCompany(w http.ResponseWriter,
 		return
 	}
 
-	_, errs := ch.companyService.DeleteCompany(uint(id))
+	_, errs := ch.companyService.DeleteUserRole(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
