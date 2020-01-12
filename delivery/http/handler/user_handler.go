@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -84,6 +85,7 @@ func (uh *UserHandler) PutUser(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
+	fmt.Printf("User id equal %d", int(id))
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -91,7 +93,7 @@ func (uh *UserHandler) PutUser(w http.ResponseWriter,
 	}
 
 	user, errs := uh.userServ.User(uint(id))
-
+	fmt.Printf("User id equal %d", int(user.ID))
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -107,7 +109,7 @@ func (uh *UserHandler) PutUser(w http.ResponseWriter,
 	r.Body.Read(body)
 
 	json.Unmarshal(body, &user)
-
+	fmt.Printf("User id unmarshaled equal %d", int(user.ID))
 	user, errs = uh.userServ.UpdateUser(user)
 
 	if len(errs) > 0 {

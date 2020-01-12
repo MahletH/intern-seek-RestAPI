@@ -193,6 +193,17 @@ func (ch *Companyhandler) PostCompany(w http.ResponseWriter,
 		return
 	}
 
+	output, err := json.MarshalIndent(company, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+
 	p := fmt.Sprintf("/v1/admin/company/%d", company.ID)
 	w.Header().Set("Location", p)
 	w.WriteHeader(http.StatusCreated)

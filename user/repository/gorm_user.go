@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
 	"github.com/abdimussa87/Intern-Seek-Version-1/user"
@@ -64,6 +65,7 @@ func (userRepo *UserGormRepo) User(id uint) (*entity.User, []error) {
 // UpdateUser updates a given user in the database
 func (userRepo *UserGormRepo) UpdateUser(user *entity.User) (*entity.User, []error) {
 	usr := user
+	fmt.Printf("User id equal %d", int(usr.ID))
 	errs := userRepo.conn.Save(usr).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
