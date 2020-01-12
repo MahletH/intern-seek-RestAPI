@@ -84,6 +84,40 @@ func (ch *Companyhandler) GetSingleCompany(w http.ResponseWriter,
 
 }
 
+//GetSingleCompanyByUserId handles GET/v1/companybyuserid/:id  requests
+func (ch *Companyhandler) GetSingleCompanyByUserId(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	id, err := strconv.Atoi(ps.ByName("id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	company, errs := ch.companyService.GetCompanyByUserId(uint(id))
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	output, err := json.MarshalIndent(company, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+
+}
+
 func (ch *Companyhandler) PutCompany(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
@@ -138,21 +172,6 @@ func (ch *Companyhandler) PutCompany(w http.ResponseWriter,
 func (ch *Companyhandler) PostCompany(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
-	id, errr := strconv.Atoi(ps.ByName("id"))
-
-	if errr != nil {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	user, errs := ch.userService.User(uint(id))
-	if len(errs) > 0 {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
 	l := r.ContentLength
 	body := make([]byte, l)
 	r.Body.Read(body)
@@ -165,14 +184,25 @@ func (ch *Companyhandler) PostCompany(w http.ResponseWriter,
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	company.UserID = user.ID
-	company, errs = ch.companyService.StoreCompany(company)
+
+	company, errs := ch.companyService.StoreCompany(company)
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	output, err := json.MarshalIndent(company, "", "\t\t")
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
 
 	p := fmt.Sprintf("/v1/admin/company/%d", company.ID)
 	w.Header().Set("Location", p)

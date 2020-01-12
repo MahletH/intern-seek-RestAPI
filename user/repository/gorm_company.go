@@ -36,6 +36,16 @@ func (compRepo *CompanyGormRepo) Company(id uint) (*entity.CompanyDetail, []erro
 	return &company, errs
 }
 
+// GetCompanyByUserId retrieves a company_detail by its user-id from the database
+func (compRepo *CompanyGormRepo) GetCompanyByUserId(id uint) (*entity.CompanyDetail, []error) {
+	company := entity.CompanyDetail{}
+	errs := compRepo.conn.Where("user_id=?", id).First(&company).GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return &company, errs
+}
+
 // UpdateCompany updates a given company_detail in the database
 func (compRepo *CompanyGormRepo) UpdateCompany(company *entity.CompanyDetail) (*entity.CompanyDetail, []error) {
 	comp := company

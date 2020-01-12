@@ -7,6 +7,7 @@ type UserRepository interface {
 	Users() ([]entity.User, []error)
 	User(id uint) (*entity.User, []error)
 	UpdateUser(user *entity.User) (*entity.User, []error)
+	UserByUsername(username string) (*entity.User, error)
 	DeleteUser(id uint) (*entity.User, []error)
 	UserByUsernameAndPassword(username string, password string) (*entity.User, error)
 	StoreUser(user *entity.User) (*entity.User, []error)
@@ -18,6 +19,7 @@ type CompanyRepository interface {
 	DeleteCompany(id uint) (*entity.CompanyDetail, []error)
 	Companies() ([]entity.CompanyDetail, []error)
 	Company(id uint) (*entity.CompanyDetail, []error)
+	GetCompanyByUserId(id uint) (*entity.CompanyDetail, []error)
 }
 type UserRoleRepository interface {
 	UserRole(id uint) (*entity.UserRole, []error)

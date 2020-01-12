@@ -1,5 +1,6 @@
 package handler
 
+<<<<<<< HEAD
 import (
 	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
@@ -12,6 +13,8 @@ func NewUserHandler(US user.UserService) *UserHandler {
 	return &UserHandler{userServ: US}
 }
 
+=======
+>>>>>>> 93e6acbd0e3224407b062f191fc84d137883d42d
 // //SignUp handles requests coming at /signup
 // func (uh UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 // 	if r.Method == http.MethodPost {

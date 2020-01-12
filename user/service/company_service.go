@@ -33,6 +33,15 @@ func (cs *CompanyService) Company(id uint) (*entity.CompanyDetail, []error) {
 	return comp, errs
 }
 
+// GetCompanyByUserId retrieves an application company_detail by its id
+func (cs *CompanyService) GetCompanyByUserId(id uint) (*entity.CompanyDetail, []error) {
+	comp, errs := cs.companyRepo.GetCompanyByUserId(id)
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return comp, errs
+}
+
 // UpdateCompany updates  a given company_detail
 func (cs *CompanyService) UpdateCompany(company *entity.CompanyDetail) (*entity.CompanyDetail, []error) {
 	comp, errs := cs.companyRepo.UpdateCompany(company)
