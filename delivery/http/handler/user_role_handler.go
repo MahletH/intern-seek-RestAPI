@@ -21,35 +21,6 @@ func NewCompanyHandler(compSrv user.CompanyService, userSrv user.UserService) *C
 	return &Companyhandler{companyService: compSrv, userService: userSrv}
 }
 
-//GetCompanies handles GET?v1/admin/roles requests
-func (ch *Companyhandler) GetCompanies(w http.ResponseWriter,
-	r *http.Request, _ httprouter.Params) {
-
-	companies, errs := ch.companyService.Companies()
-
-	if len(errs) > 0 {
-
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-
-	}
-
-	output, err := json.MarshalIndent(companies, "", "\t\t")
-
-	if err != nil {
-
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(output)
-	return
-
-}
-
 //GetSingleRoles handles GET/v1/admin/roles/:id  requests
 func (ch *Companyhandler) GetSingleCompany(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
@@ -63,56 +34,6 @@ func (ch *Companyhandler) GetSingleCompany(w http.ResponseWriter,
 	}
 
 	company, errs := ch.companyService.Company(uint(id))
-
-	if len(errs) > 0 {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	output, err := json.MarshalIndent(company, "", "\t\t")
-
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(output)
-	return
-
-}
-
-func (ch *Companyhandler) PutCompany(w http.ResponseWriter,
-	r *http.Request, ps httprouter.Params) {
-
-	id, err := strconv.Atoi(ps.ByName("id"))
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	company, errs := ch.companyService.Company(uint(id))
-
-	if len(errs) > 0 {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-
-		return
-
-	}
-
-	l := r.ContentLength
-
-	body := make([]byte, l)
-
-	r.Body.Read(body)
-
-	json.Unmarshal(body, &company)
-
-	company, errs = ch.companyService.UpdateCompany(company)
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")

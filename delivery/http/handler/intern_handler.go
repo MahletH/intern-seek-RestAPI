@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/abdimussa87/Intern-Seek-Version-1/user"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
 
 type UserHandler struct {

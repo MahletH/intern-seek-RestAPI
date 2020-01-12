@@ -4,13 +4,13 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/abdimussa87/Intern-Seek-Version-1/delivery/http/handler"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
-	userRep "github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user/service"
-	userServ "github.com/abdimussa87/Intern-Seek-Version-1/user/service"
 	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/delivery/http/handler"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/user/repository"
+	userRep "github.com/nebyubeyene/Intern-Seek-Version-1/user/repository"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/user/service"
+	userServ "github.com/nebyubeyene/Intern-Seek-Version-1/user/service"
 
 	_ "github.com/lib/pq"
 )
@@ -29,15 +29,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	dbconn, err := gorm.Open("postgres", "user=postgres dbname=gorminterndb password='P@$$wOrDd' sslmode=disable")
+	dbconn, err := gorm.Open("postgres", "user=postgres dbname=gorminterndb password='P@$$w0rDd' sslmode=disable")
 
 	if err != nil {
 		panic(err)
 	}
 
 	defer dbconn.Close()
-	//dbconn.DropTableIfExists(&entity.CompanyDetail{}, &entity.User{})
-	// errs := dbconn.CreateTable(&entity.User{}, &entity.CompanyDetail{}).GetErrors()
+	// dbconn.DropTableIfExists(&entity.CompanyDetail{}, &entity.User{})
+	// errs := dbconn.CreateTable(&entity.UserRole{}).GetErrors()
 
 	// if len(errs) > 0 {
 	// 	panic(errs)
@@ -60,7 +60,7 @@ func main() {
 
 	router.GET("/v1/company", compHandler.GetCompanies)
 	router.GET("/v1/company/:id", compHandler.GetSingleCompany)
-	router.POST("/v1/company/:id", compHandler.PostCompany)
+	router.POST("/v1/company", compHandler.PostCompany)
 	router.PUT("/v1/company/update/:id", compHandler.PutCompany)
 	router.DELETE("/v1/company/delete/:id", compHandler.DeleteCompany)
 

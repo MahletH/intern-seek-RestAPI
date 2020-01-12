@@ -3,9 +3,9 @@ package repository
 import (
 	"errors"
 
-	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user"
 	"github.com/jinzhu/gorm"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/entity"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 	"golang.org/x/crypto/bcrypt"
 )
 
