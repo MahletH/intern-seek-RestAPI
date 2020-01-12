@@ -43,6 +43,14 @@ func (userRepo *UserGormRepo) UserByUsernameAndPassword(username string, passwor
 	return user, nil
 }
 
+func (userRepo *UserGormRepo) UserByUsername(username string) (*entity.User, error) {
+	user := &entity.User{}
+	if err := userRepo.conn.Where("username=?", username).Find(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 // User retrieves a user by its id from the database
 func (userRepo *UserGormRepo) User(id uint) (*entity.User, []error) {
 	user := entity.User{}
