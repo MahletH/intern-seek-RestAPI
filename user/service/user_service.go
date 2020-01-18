@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/entity"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
 
 // UserService implements menu.UserService interface

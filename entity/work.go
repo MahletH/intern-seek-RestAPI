@@ -1,4 +1,6 @@
 package entity
+
+
 type Work struct{
 	Name string
 	AcademicLevelReq string

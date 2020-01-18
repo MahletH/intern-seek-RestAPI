@@ -7,48 +7,21 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/entity"
 	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
 
-type UserHandler struct {
-	userServ user.UserService
+type UserRoleHandler struct {
+	companyService user.UserRoleService
 }
 
-func NewUserHandler(US user.UserService) *UserHandler {
-	return &UserHandler{userServ: US}
+func NewUserRoleHandler(compSrv user.UserRoleService) *UserRoleHandler {
+
+	return &UserRoleHandler{companyService: compSrv}
 }
 
-//GetUsers handles GET/v1/users requests
-func (uh *UserHandler) GetUsers(w http.ResponseWriter,
-	r *http.Request, _ httprouter.Params) {
-
-	users, errs := uh.userServ.Users()
-
-	if len(errs) > 0 {
-
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-
-	}
-
-	output, err := json.MarshalIndent(users, "", "\t\t")
-
-	if err != nil {
-
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(output)
-	return
-
-}
-
-//GetSingleUser handles GET/v1/users/:id  requests
-func (uh *UserHandler) GetSingleUser(w http.ResponseWriter,
+//GetSingleRoles handles GET/v1/admin/roles/:id  requests
+func (ch *UserRoleHandler) GetSingleUserRole(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -59,7 +32,7 @@ func (uh *UserHandler) GetSingleUser(w http.ResponseWriter,
 		return
 	}
 
-	user, errs := uh.userServ.User(uint(id))
+	userole, errs := ch.companyService.UserRole(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -67,7 +40,7 @@ func (uh *UserHandler) GetSingleUser(w http.ResponseWriter,
 		return
 	}
 
-	output, err := json.MarshalIndent(user, "", "\t\t")
+	output, err := json.MarshalIndent(userole, "", "\t\t")
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -81,44 +54,16 @@ func (uh *UserHandler) GetSingleUser(w http.ResponseWriter,
 
 }
 
-func (uh *UserHandler) PutUser(w http.ResponseWriter,
+//TO DO change ps to not get userid
+func (ch *UserRoleHandler) PostUserRole(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
-
-	id, err := strconv.Atoi(ps.ByName("id"))
-	fmt.Printf("User id equal %d", int(id))
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	user, errs := uh.userServ.User(uint(id))
-	fmt.Printf("User id equal %d", int(user.ID))
-	if len(errs) > 0 {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-
-		return
-
-	}
 
 	l := r.ContentLength
-
 	body := make([]byte, l)
-
 	r.Body.Read(body)
+	userole := &entity.UserRole{}
 
-	json.Unmarshal(body, &user)
-	fmt.Printf("User id unmarshaled equal %d", int(user.ID))
-	user, errs = uh.userServ.UpdateUser(user)
-
-	if len(errs) > 0 {
-		w.Header().Set("Content-Type", "application/json")
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-
-	output, err := json.MarshalIndent(user, "", "\t\t")
+	err := json.Unmarshal(body, userole)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -126,8 +71,42 @@ func (uh *UserHandler) PutUser(w http.ResponseWriter,
 		return
 	}
 
+	userole, errs := ch.companyService.StoreUserRole(userole)
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	p := fmt.Sprintf("/v1/userrole/%d", userole.UserId)
+	w.Header().Set("Location", p)
+	w.WriteHeader(http.StatusCreated)
+	return
+
+}
+
+func (ch *UserRoleHandler) DeleteUserRole(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	id, err := strconv.Atoi(ps.ByName("id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	_, errs := ch.companyService.DeleteUserRole(uint(id))
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(output)
+	w.WriteHeader(http.StatusNoContent)
 	return
 
 }

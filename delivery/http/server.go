@@ -5,14 +5,15 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/abdimussa87/Intern-Seek-Version-1/delivery/http/handler"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
-	userRep "github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user/service"
-	userServ "github.com/abdimussa87/Intern-Seek-Version-1/user/service"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/delivery/http/handler"
+	"github.com/nebyubeyene/Intern-Seek-Version-1/user/repository"
+	userRep "github.com/nebyubeyene/Intern-Seek-Version-1/user/repository"
+
+	"github.com/nebyubeyene/Intern-Seek-Version-1/user/service"
+	userServ "github.com/nebyubeyene/Intern-Seek-Version-1/user/service"
 
 	_ "github.com/lib/pq"
 )
@@ -31,15 +32,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	dbconn, err := gorm.Open("postgres", "user=postgres dbname=gorminterndb password='P@$$wOrDd' sslmode=disable")
+	dbconn, err := gorm.Open("postgres", "user=postgres dbname=gorminterndb password='P@$$w0rDd' sslmode=disable")
 
 	if err != nil {
 		panic(err)
 	}
 
 	defer dbconn.Close()
-	//dbconn.DropTableIfExists(&entity.CompanyDetail{}, &entity.User{})
-	// errs := dbconn.CreateTable(&entity.User{}, &entity.CompanyDetail{}).GetErrors()
+	// dbconn.DropTableIfExists(&entity.CompanyDetail{}, &entity.User{})
+	// errs := dbconn.CreateTable(&entity.UserRole{}).GetErrors()
 
 	// if len(errs) > 0 {
 	// 	panic(errs)
@@ -55,6 +56,11 @@ func main() {
 
 	compHandler := handler.NewCompanyHandler(compServ, userServi)
 
+	userroleRepo := userRep.NewUserRoleGormRepo(dbconn)
+	userroleServ := userServ.NewUserRoleService(userroleRepo)
+
+	usroleHandler := handler.NewUserRoleHandler(userroleServ)
+
 	signUpHandler := handler.NewSignUpHandler(userServi)
 	signInHandler := handler.NewSignInHandler(userServi)
 
@@ -64,6 +70,12 @@ func main() {
 	router.POST("/v1/signin", signInHandler.SignIn)
 
 	//Protected route
+
+	router.POST("/v1/userrole", usroleHandler.PostUserRole)
+
+	router.GET("/v1/userrole/:id", usroleHandler.GetSingleUserRole)
+	router.DELETE("/v1/userrole/delete/:id", usroleHandler.DeleteUserRole)
+
 	router.GET("/v1/company", compHandler.GetCompanies)
 	router.GET("/v1/company/:id", compHandler.GetSingleCompany)
 	router.POST("/v1/company", compHandler.PostCompany)
