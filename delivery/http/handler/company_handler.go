@@ -13,12 +13,11 @@ import (
 
 type Companyhandler struct {
 	companyService user.CompanyService
-	userService    user.UserService
 }
 
-func NewCompanyHandler(compSrv user.CompanyService, userSrv user.UserService) *Companyhandler {
+func NewCompanyHandler(compSrv user.CompanyService) *Companyhandler {
 
-	return &Companyhandler{companyService: compSrv, userService: userSrv}
+	return &Companyhandler{companyService: compSrv}
 }
 
 //GetCompanies handles GET?v1/admin/roles requests
@@ -204,7 +203,7 @@ func (ch *Companyhandler) PostCompany(w http.ResponseWriter,
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(output)
 
-	p := fmt.Sprintf("/v1/admin/company/%d", company.ID)
+	p := fmt.Sprintf("/v1/company/%d", company.ID)
 	w.Header().Set("Location", p)
 	w.WriteHeader(http.StatusCreated)
 	return
