@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/abdimussa87/Intern-Seek-Version-1/delivery/http/handler"
-	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
 	"github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
 	userRep "github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
 	"github.com/dgrijalva/jwt-go"
@@ -33,15 +32,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	dbconn, err := gorm.Open("postgres", "user=postgres dbname=gorminterndb password='P@$$w0rDd' sslmode=disable")
+	dbconn, err := gorm.Open("postgres", "user=postgres dbname=gorminterndb password='P@$$wOrDd' sslmode=disable")
 
 	if err != nil {
 		panic(err)
 	}
 
 	defer dbconn.Close()
-	// dbconn.DropTableIfExists(&entity.CompanyDetail{}, &entity.User{})
-	errs := dbconn.CreateTable(&entity.UserRole{}).GetErrors()
+	// dbconn.DropTableIfExists(&entity.UserRole{}, &entity.CompanyDetail{}, &entity.User{})
+	// errs := dbconn.CreateTable(&entity.User{}, &entity.UserRole{}, &entity.CompanyDetail{}).GetErrors()
 
 	// if len(errs) > 0 {
 	// 	panic(errs)
@@ -55,7 +54,7 @@ func main() {
 
 	userHandler := handler.NewUserHandler(userServi)
 
-	compHandler := handler.NewCompanyHandler(compServ, userServi)
+	compHandler := handler.NewCompanyHandler(compServ)
 
 	userroleRepo := userRep.NewUserRoleGormRepo(dbconn)
 	userroleServ := userServ.NewUserRoleService(userroleRepo)
@@ -63,7 +62,7 @@ func main() {
 	usroleHandler := handler.NewUserRoleHandler(userroleServ)
 
 	signUpHandler := handler.NewSignUpHandler(userServi)
-	signInHandler := handler.NewSignInHandler(userServi)
+	signInHandler := handler.NewSignInHandler(userServi, userroleServ)
 
 	router := httprouter.New()
 

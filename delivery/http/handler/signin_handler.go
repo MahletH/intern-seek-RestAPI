@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -13,14 +14,16 @@ import (
 
 type SignInHandler struct {
 	userServ user.UserService
+	userRole user.UserRoleService
 }
 
-func NewSignInHandler(US user.UserService) *SignInHandler {
-	return &SignInHandler{userServ: US}
+func NewSignInHandler(US user.UserService, UR user.UserRoleService) *SignInHandler {
+	return &SignInHandler{userServ: US, userRole: UR}
 }
 
 type Claims struct {
 	UserID uint
+	Role   string
 	Name   string
 	jwt.StandardClaims
 }
@@ -41,9 +44,18 @@ func (sih *SignInHandler) SignIn(w http.ResponseWriter, r *http.Request, _ httpr
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
+	role, errs := sih.userRole.UserRole(usr.ID)
+	if len(errs) > 0 {
+		fmt.Println("got into error from getting user role")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	expirationTime := time.Now().Add(5 * time.Minute)
 	claim := &Claims{
 		UserID: usr.ID,
+		Role:   role.Role,
 		Name:   usr.Name,
 		StandardClaims: jwt.StandardClaims{
 

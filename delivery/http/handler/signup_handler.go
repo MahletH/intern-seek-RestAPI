@@ -74,7 +74,7 @@ func (suh *SignUpHandler) SignUp(w http.ResponseWriter, r *http.Request, _ httpr
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	resp := map[string]interface{}{}
+	resp := map[string]interface{}{"status": false, "message": "logged in"}
 	resp["token"] = tokenString
 	json.NewEncoder(w).Encode(resp)
 
