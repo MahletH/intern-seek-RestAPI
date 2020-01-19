@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 
 	"github.com/abdimussa87/Intern-Seek-Version-1/delivery/http/handler"
 	"github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
 	userRep "github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 
@@ -97,53 +95,57 @@ func main() {
 }
 
 //Middleware for checking authorization for viewing a page
-func isAuthorizedCompany(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//Already implemented on client side
 
-		if r.Header["Token"] != nil {
-			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("There was an error")
-				}
-				return []byte("secret"), nil
-			})
-			if err != nil {
-				fmt.Fprintf(w, err.Error())
-			}
+// func isAuthorizedCompany(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			if token.Valid {
-				endpoint(w, r)
-			}
+// 		if r.Header["Token"] != nil {
+// 			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
+// 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+// 					return nil, fmt.Errorf("There was an error")
+// 				}
+// 				return []byte("secret"), nil
+// 			})
+// 			if err != nil {
+// 				fmt.Fprintf(w, err.Error())
+// 			}
 
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-	})
-}
+// 			if token.Valid {
+// 				endpoint(w, r)
+// 			}
+
+// 		} else {
+// 			w.WriteHeader(http.StatusUnauthorized)
+// 			return
+// 		}
+// 	})
+// }
 
 //Middleware for checking authorization for viewing a page
-func isAuthorizedIntern(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//Already implemented on client side
 
-		if r.Header["Token"] != nil {
-			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("There was an error")
-				}
-				return []byte("secret"), nil
-			})
-			if err != nil {
-				fmt.Fprintf(w, err.Error())
-			}
+// func isAuthorizedIntern(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			if token.Valid {
-				endpoint(w, r)
-			}
+// 		if r.Header["Token"] != nil {
+// 			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
+// 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+// 					return nil, fmt.Errorf("There was an error")
+// 				}
+// 				return []byte("secret"), nil
+// 			})
+// 			if err != nil {
+// 				fmt.Fprintf(w, err.Error())
+// 			}
 
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-	})
-}
+// 			if token.Valid {
+// 				endpoint(w, r)
+// 			}
+
+// 		} else {
+// 			w.WriteHeader(http.StatusUnauthorized)
+// 			return
+// 		}
+// 	})
+// }
