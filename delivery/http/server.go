@@ -5,15 +5,16 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/abdimussa87/Intern-Seek-Version-1/delivery/http/handler"
+	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
+	"github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
+	userRep "github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/delivery/http/handler"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/user/repository"
-	userRep "github.com/nebyubeyene/Intern-Seek-Version-1/user/repository"
 
-	"github.com/nebyubeyene/Intern-Seek-Version-1/user/service"
-	userServ "github.com/nebyubeyene/Intern-Seek-Version-1/user/service"
+	"github.com/abdimussa87/Intern-Seek-Version-1/user/service"
+	userServ "github.com/abdimussa87/Intern-Seek-Version-1/user/service"
 
 	_ "github.com/lib/pq"
 )
@@ -40,7 +41,7 @@ func main() {
 
 	defer dbconn.Close()
 	// dbconn.DropTableIfExists(&entity.CompanyDetail{}, &entity.User{})
-	// errs := dbconn.CreateTable(&entity.UserRole{}).GetErrors()
+	errs := dbconn.CreateTable(&entity.UserRole{}).GetErrors()
 
 	// if len(errs) > 0 {
 	// 	panic(errs)

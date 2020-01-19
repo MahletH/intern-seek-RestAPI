@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/abdimussa87/Intern-Seek-Version-1/user"
 	"github.com/julienschmidt/httprouter"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
 
 type UserHandler struct {

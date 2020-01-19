@@ -1,9 +1,9 @@
 package repository
 
 import (
+	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
+	"github.com/abdimussa87/Intern-Seek-Version-1/user"
 	"github.com/jinzhu/gorm"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/entity"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
 
 // CompanyGormRepo Implements the user.CompanyRepository interface

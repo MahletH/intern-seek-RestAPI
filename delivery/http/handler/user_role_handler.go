@@ -6,22 +6,22 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
+	"github.com/abdimussa87/Intern-Seek-Version-1/user"
 	"github.com/julienschmidt/httprouter"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/entity"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
 
 type UserRoleHandler struct {
-	companyService user.UserRoleService
+	userRoleService user.UserRoleService
 }
 
-func NewUserRoleHandler(compSrv user.UserRoleService) *UserRoleHandler {
+func NewUserRoleHandler(userRoleSrv user.UserRoleService) *UserRoleHandler {
 
-	return &UserRoleHandler{companyService: compSrv}
+	return &UserRoleHandler{userRoleService: userRoleSrv}
 }
 
 //GetSingleRoles handles GET/v1/admin/roles/:id  requests
-func (ch *UserRoleHandler) GetSingleUserRole(w http.ResponseWriter,
+func (urh *UserRoleHandler) GetSingleUserRole(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -32,7 +32,7 @@ func (ch *UserRoleHandler) GetSingleUserRole(w http.ResponseWriter,
 		return
 	}
 
-	userole, errs := ch.companyService.UserRole(uint(id))
+	userole, errs := urh.userRoleService.UserRole(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -55,7 +55,7 @@ func (ch *UserRoleHandler) GetSingleUserRole(w http.ResponseWriter,
 }
 
 //TO DO change ps to not get userid
-func (ch *UserRoleHandler) PostUserRole(w http.ResponseWriter,
+func (urh *UserRoleHandler) PostUserRole(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	l := r.ContentLength
@@ -71,13 +71,22 @@ func (ch *UserRoleHandler) PostUserRole(w http.ResponseWriter,
 		return
 	}
 
-	userole, errs := ch.companyService.StoreUserRole(userole)
+	userole, errs := urh.userRoleService.StoreUserRole(userole)
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+	output, err := json.MarshalIndent(userole, "", "\t\t")
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
 
 	p := fmt.Sprintf("/v1/userrole/%d", userole.UserId)
 	w.Header().Set("Location", p)
@@ -86,7 +95,7 @@ func (ch *UserRoleHandler) PostUserRole(w http.ResponseWriter,
 
 }
 
-func (ch *UserRoleHandler) DeleteUserRole(w http.ResponseWriter,
+func (urh *UserRoleHandler) DeleteUserRole(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -97,7 +106,7 @@ func (ch *UserRoleHandler) DeleteUserRole(w http.ResponseWriter,
 		return
 	}
 
-	_, errs := ch.companyService.DeleteUserRole(uint(id))
+	_, errs := urh.userRoleService.DeleteUserRole(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")

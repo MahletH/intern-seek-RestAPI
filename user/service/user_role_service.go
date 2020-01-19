@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/nebyubeyene/Intern-Seek-Version-1/entity"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
+	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
+	"github.com/abdimussa87/Intern-Seek-Version-1/user"
 )
 
 // UserRoleService implements menu.UserRoleService interface
@@ -15,7 +15,7 @@ func NewUserRoleService(RoleRepo user.UserRoleRepository) user.UserRoleService {
 	return &UserRoleService{roleRepo: RoleRepo}
 }
 
-// Role retrievs a given user role by its id
+//UserRole retrievs a given user role by its id
 func (rs *UserRoleService) UserRole(id uint) (*entity.UserRole, []error) {
 	rl, errs := rs.roleRepo.UserRole(id)
 	if len(errs) > 0 {
@@ -25,7 +25,7 @@ func (rs *UserRoleService) UserRole(id uint) (*entity.UserRole, []error) {
 
 }
 
-// DeleteRole deletes a given user role
+// DeleteUserRole deletes a given user role
 func (rs *UserRoleService) DeleteUserRole(id uint) (*entity.UserRole, []error) {
 
 	rl, errs := rs.roleRepo.DeleteUserRole(id)

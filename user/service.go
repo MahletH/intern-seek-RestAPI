@@ -1,6 +1,6 @@
 package user
 
-import "github.com/nebyubeyene/Intern-Seek-Version-1/entity"
+import "github.com/abdimussa87/Intern-Seek-Version-1/entity"
 
 //UserService specifies user related services
 type UserService interface {

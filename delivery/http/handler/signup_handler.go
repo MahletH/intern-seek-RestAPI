@@ -8,10 +8,10 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
+	"github.com/abdimussa87/Intern-Seek-Version-1/user"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/entity"
-	"github.com/nebyubeyene/Intern-Seek-Version-1/user"
 )
 
 type SignUpHandler struct {
@@ -74,11 +74,14 @@ func (suh *SignUpHandler) SignUp(w http.ResponseWriter, r *http.Request, _ httpr
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	resp := map[string]interface{}{}
+	resp["token"] = tokenString
+	json.NewEncoder(w).Encode(resp)
 
-	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
+	// http.SetCookie(w, &http.Cookie{
+	// 	Name:    "token",
+	// 	Value:   tokenString,
+	// 	Expires: expirationTime,
+	// })
 
 }
