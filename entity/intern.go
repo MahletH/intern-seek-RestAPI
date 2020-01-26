@@ -1,10 +1,15 @@
 package entity
 
 type Intern struct {
-	FName       string
-	LName       string
-	Field       string
-	Description string
-	userName    string
-	password    string
+	// ID            int
+	// UserName      string
+	// FullName      string
+	// Email         string
+	// Phone         string
+	// password      string
+	// Field         string
+	// AcademicLevel string
+
+	InterDetail PersonalDetails
+	InternUser  User
 }

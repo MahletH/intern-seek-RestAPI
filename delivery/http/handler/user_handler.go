@@ -1,39 +1,81 @@
 package handler
 
 import (
-	"html/template"
+	"encoding/json"
 	"net/http"
+	"strconv"
 
-	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
 	"github.com/abdimussa87/Intern-Seek-Version-1/user"
+	"github.com/julienschmidt/httprouter"
 )
 
 type UserHandler struct {
-	t        *template.Template
 	userServ user.UserService
 }
 
-func NewUserHandler(T *template.Template, US user.UserService) *UserHandler {
-	return &UserHandler{t: T, userServ: US}
+func NewUserHandler(US user.UserService) *UserHandler {
+	return &UserHandler{userServ: US}
 }
 
-//SignUp handles requests coming at /signup
-func (uh UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		user := entity.User{}
-		user.Fullname = r.FormValue("fullname")
-		user.UUID = r.FormValue("username")
-		user.Email = r.FormValue("email")
-		user.Phone = r.FormValue("phone")
-		user.Password = r.FormValue("password")
+//GetUsers handles GET/v1/users requests
+func (uh *UserHandler) GetUsers(w http.ResponseWriter,
+	r *http.Request, _ httprouter.Params) {
 
-		err := uh.userServ.StoreUser(user)
-		if err != nil {
-			panic(err)
-		}
+	users, errs := uh.userServ.Users()
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	} else if r.Method == http.MethodGet {
-		uh.t.ExecuteTemplate(w, "signup.html", nil)
+	if len(errs) > 0 {
+
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+
 	}
+
+	output, err := json.MarshalIndent(users, "", "\t\t")
+
+	if err != nil {
+
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+
+}
+
+//GetSingleUser handles GET/v1/users/:id  requests
+func (uh *UserHandler) GetSingleUser(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	id, err := strconv.Atoi(ps.ByName("id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	user, errs := uh.userServ.User(uint(id))
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	output, err := json.MarshalIndent(user, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+
 }
