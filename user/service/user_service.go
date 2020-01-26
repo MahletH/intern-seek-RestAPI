@@ -23,6 +23,13 @@ func (us *UserService) Users() ([]entity.User, []error) {
 	}
 	return usrs, errs
 }
+func (us *UserService) UserByUsername(username string) (*entity.User, error) {
+	usr, err := us.userRepo.UserByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	return usr, nil
+}
 
 //UserByUsernameAndPassword returns a user given a username and password if it exists
 func (us *UserService) UserByUsernameAndPassword(username string, password string) (*entity.User, error) {

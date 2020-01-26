@@ -10,6 +10,7 @@ type UserService interface {
 	DeleteUser(id uint) (*entity.User, []error)
 	StoreUser(user *entity.User) (*entity.User, []error)
 	UserByUsernameAndPassword(username string, password string) (*entity.User, error)
+	UserByUsername(username string) (*entity.User, error)
 }
 type CompanyService interface {
 	StoreCompany(company *entity.CompanyDetail) (*entity.CompanyDetail, []error)
