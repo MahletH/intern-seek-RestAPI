@@ -19,10 +19,10 @@ type CompanyService interface {
 	Companies() ([]entity.CompanyDetail, []error)
 	Company(id uint) (*entity.CompanyDetail, []error)
 }
-type ApplicationService interface {
-	StoreApplication(application *entity.Application)(*entity.Application,[]error)
-	UpdateApplication(application *entity.Application)(*entity.Application,[]error)
-	DeleteApplication(id uint)(*entity.Application,[]error)
-	Applications()([]entity.Application,[]error)
-	Application(id uint)(*entity.Application,[]error)
+type InternService interface {
+	StoreIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
+	UpdateIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
+	DeleteIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
+	Interns()([]entity.PersonalDetails,[]error)
+	Intern(id uint)(*entity.PersonalDetails,[]error)
 }
