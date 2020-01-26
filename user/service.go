@@ -18,6 +18,13 @@ type CompanyService interface {
 	DeleteCompany(id uint) (*entity.CompanyDetail, []error)
 	Companies() ([]entity.CompanyDetail, []error)
 	Company(id uint) (*entity.CompanyDetail, []error)
+	GetCompanyByUserId(id uint) (*entity.CompanyDetail, []error)
+}
+type UserRoleService interface {
+	UserRole(id uint) (*entity.UserRole, []error)
+
+	DeleteUserRole(id uint) (*entity.UserRole, []error)
+	StoreUserRole(role *entity.UserRole) (*entity.UserRole, []error)
 }
 type InternService interface {
 	StoreIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)

@@ -12,13 +12,11 @@ import (
 	intServ "github.com/abdimussa87/Intern-Seek-Version-1/internship/service"
 	"github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
 	userRep "github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user/service"
-	userServ "github.com/abdimussa87/Intern-Seek-Version-1/user/service"
-
-	// "github.com/abdimussa87/Intern-Seek-Version-1/entity"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
+
+	"github.com/abdimussa87/Intern-Seek-Version-1/user/service"
+	userServ "github.com/abdimussa87/Intern-Seek-Version-1/user/service"
 
 	_ "github.com/lib/pq"
 )
@@ -44,8 +42,8 @@ func main() {
 	}
 
 	defer dbconn.Close()
-	// dbconn.DropTableIfExists(&entity.CompanyDetail{}, &entity.User{}, &entity.Application{}, &entity.PersonalDetails{}, &entity.Internship{})
-	// errs := dbconn.CreateTable(&entity.User{}, &entity.CompanyDetail{}, &entity.Application{}, &entity.PersonalDetails{}, &entity.Internship{},&entity.Fields{}).GetErrors()
+	// dbconn.DropTableIfExists(&entity.UserRole{}, &entity.CompanyDetail{}, &entity.User{})
+	// errs := dbconn.CreateTable(&entity.User{}, &entity.UserRole{}, &entity.CompanyDetail{}).GetErrors()
 
 	// if len(errs) > 0 {
 	// 	panic(errs)
@@ -65,14 +63,19 @@ func main() {
 
 	userHandler := handler.NewUserHandler(userServi)
 
-	compHandler := handler.NewCompanyHandler(compServ, userServi)
+	compHandler := handler.NewCompanyHandler(compServ)
+
+	userroleRepo := userRep.NewUserRoleGormRepo(dbconn)
+	userroleServ := userServ.NewUserRoleService(userroleRepo)
+
+	usroleHandler := handler.NewUserRoleHandler(userroleServ)
 
 	appHandler := handler.NewApplicationHandler(appServi)
 
 	intHandler := handler.NewInternshipHandler(intServi)
 
 	signUpHandler := handler.NewSignUpHandler(userServi)
-	signInHandler := handler.NewSignInHandler(userServi)
+	signInHandler := handler.NewSignInHandler(userServi, userroleServ)
 
 	router := httprouter.New()
 
@@ -80,26 +83,20 @@ func main() {
 	router.POST("/v1/signin", signInHandler.SignIn)
 
 	//Protected route
-	router.GET("/v1/companies", compHandler.GetCompanies)
+
+	router.POST("/v1/userrole", usroleHandler.PostUserRole)
+
+	router.GET("/v1/userrole/:id", usroleHandler.GetSingleUserRole)
+	router.DELETE("/v1/userrole/delete/:id", usroleHandler.DeleteUserRole)
+
+	router.GET("/v1/company", compHandler.GetCompanies)
 	router.GET("/v1/company/:id", compHandler.GetSingleCompany)
 	router.POST("/v1/company", compHandler.PostCompany)
 	router.PUT("/v1/company/update/:id", compHandler.PutCompany)
 	router.DELETE("/v1/company/delete/:id", compHandler.DeleteCompany)
-
 	router.GET("/v1/users/:id", userHandler.GetSingleUser)
-	router.GET("/v1/users/", userHandler.GetUsers)
-
-	router.GET("/v1/application", appHandler.GetApplications)
-	router.GET("/v1/application/:id", appHandler.GetSingleApplication)
-	router.POST("/v1/application", appHandler.PostApplication)
-	router.PUT("/v1/application/update/:id", appHandler.PutApplication)
-	router.DELETE("/v1/application/delete/:id", appHandler.DeleteApplication)
-
-	router.GET("/v1/internships", intHandler.GetInternships)
-	router.GET("/v1/internship/:id", intHandler.GetSingleInternship)
-	router.POST("/v1/internship", intHandler.PostInternship)
-	router.PUT("/v1/internship/update/:id", intHandler.PutInternship)
-	router.DELETE("/v1/internship/delete/:id", intHandler.DeleteInternship)
+	router.PUT("/v1/user/update/:id", userHandler.PutUser)
+	router.GET("/v1/companybyuserid/:id", compHandler.GetSingleCompanyByUserId)
 
 	http.ListenAndServe(":8181", router)
 
@@ -113,53 +110,57 @@ func main() {
 }
 
 //Middleware for checking authorization for viewing a page
-func isAuthorizedCompany(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//Already implemented on client side
 
-		if r.Header["Token"] != nil {
-			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("There was an error")
-				}
-				return []byte("secret"), nil
-			})
-			if err != nil {
-				fmt.Fprintf(w, err.Error())
-			}
+// func isAuthorizedCompany(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			if token.Valid {
-				endpoint(w, r)
-			}
+// 		if r.Header["Token"] != nil {
+// 			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
+// 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+// 					return nil, fmt.Errorf("There was an error")
+// 				}
+// 				return []byte("secret"), nil
+// 			})
+// 			if err != nil {
+// 				fmt.Fprintf(w, err.Error())
+// 			}
 
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-	})
-}
+// 			if token.Valid {
+// 				endpoint(w, r)
+// 			}
+
+// 		} else {
+// 			w.WriteHeader(http.StatusUnauthorized)
+// 			return
+// 		}
+// 	})
+// }
 
 //Middleware for checking authorization for viewing a page
-func isAuthorizedIntern(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//Already implemented on client side
 
-		if r.Header["Token"] != nil {
-			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("There was an error")
-				}
-				return []byte("secret"), nil
-			})
-			if err != nil {
-				fmt.Fprintf(w, err.Error())
-			}
+// func isAuthorizedIntern(endpoint func(w http.ResponseWriter, r *http.Request)) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			if token.Valid {
-				endpoint(w, r)
-			}
+// 		if r.Header["Token"] != nil {
+// 			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
+// 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+// 					return nil, fmt.Errorf("There was an error")
+// 				}
+// 				return []byte("secret"), nil
+// 			})
+// 			if err != nil {
+// 				fmt.Fprintf(w, err.Error())
+// 			}
 
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-	})
-}
+// 			if token.Valid {
+// 				endpoint(w, r)
+// 			}
+
+// 		} else {
+// 			w.WriteHeader(http.StatusUnauthorized)
+// 			return
+// 		}
+// 	})
+// }

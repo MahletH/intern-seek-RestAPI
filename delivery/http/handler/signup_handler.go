@@ -55,7 +55,7 @@ func (suh *SignUpHandler) SignUp(w http.ResponseWriter, r *http.Request, _ httpr
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(15 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &claims{
 		UserID: createdUser.ID,
@@ -74,11 +74,14 @@ func (suh *SignUpHandler) SignUp(w http.ResponseWriter, r *http.Request, _ httpr
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	resp := map[string]interface{}{"status": false, "message": "logged in"}
+	resp["token"] = tokenString
+	json.NewEncoder(w).Encode(resp)
 
-	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
+	// http.SetCookie(w, &http.Cookie{
+	// 	Name:    "token",
+	// 	Value:   tokenString,
+	// 	Expires: expirationTime,
+	// })
 
 }
