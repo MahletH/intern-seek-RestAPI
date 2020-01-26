@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/WebProgrammingAAiT/intern-seek-web-project/entity"
-	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship"
+	"github.com/MahletH/intern-seek-RestAPI/entity"
+	"github.com/MahletH/intern-seek-RestAPI/internship"
 )
 
 // InternshipService implements menu.CommentService interface

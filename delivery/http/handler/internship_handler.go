@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
-	"github.com/abdimussa87/Intern-Seek-Version-1/internship"
+	"github.com/MahletH/intern-seek-RestAPI/entity"
+	"github.com/MahletH/intern-seek-RestAPI/internship"
 	"github.com/julienschmidt/httprouter"
 )
 

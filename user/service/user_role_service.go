@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user"
+	"github.com/MahletH/intern-seek-RestAPI/entity"
+	"github.com/MahletH/intern-seek-RestAPI/user"
 )
 
 // UserRoleService implements menu.UserRoleService interface

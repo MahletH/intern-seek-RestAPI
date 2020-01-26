@@ -1,6 +1,6 @@
 package internship
 
-import "github.com/WebProgrammingAAiT/intern-seek-web-project/entity"
+import "github.com/MahletH/intern-seek-RestAPI/entity"
 
 // InternshipService specifies customer comment related service
 type InternshipService interface {

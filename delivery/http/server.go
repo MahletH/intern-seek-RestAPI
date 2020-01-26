@@ -1,22 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 
-	appRep "github.com/abdimussa87/Intern-Seek-Version-1/application/repository"
-	appServ "github.com/abdimussa87/Intern-Seek-Version-1/application/service"
-	"github.com/abdimussa87/Intern-Seek-Version-1/delivery/http/handler"
-	intRep "github.com/abdimussa87/Intern-Seek-Version-1/internship/repository"
-	intServ "github.com/abdimussa87/Intern-Seek-Version-1/internship/service"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
-	userRep "github.com/abdimussa87/Intern-Seek-Version-1/user/repository"
+	// appRep "github.com/MahletH/intern-seek-RestAPI/application/repository"
+	// appServ "github.com/MahletH/intern-seek-RestAPI/application/service"
+	"github.com/MahletH/intern-seek-RestAPI/delivery/http/handler"
+	intRep "github.com/MahletH/intern-seek-RestAPI/internship/repository"
+	intServ "github.com/MahletH/intern-seek-RestAPI/internship/service"
+	"github.com/MahletH/intern-seek-RestAPI/user/repository"
+	userRep "github.com/MahletH/intern-seek-RestAPI/user/repository"
 	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/abdimussa87/Intern-Seek-Version-1/user/service"
-	userServ "github.com/abdimussa87/Intern-Seek-Version-1/user/service"
+	"github.com/MahletH/intern-seek-RestAPI/user/service"
+	userServ "github.com/MahletH/intern-seek-RestAPI/user/service"
 
 	_ "github.com/lib/pq"
 )
@@ -52,8 +51,8 @@ func main() {
 	userRepo := userRep.NewUserGormRepoImpl(dbconn)
 	userServi := userServ.NewUserServiceImpl(userRepo)
 
-	appRepo := appRep.NewApplicationGormRepoImpl(dbconn)
-	appServi := appServ.NewApplicationServiceImpl(appRepo)
+	// appRepo := appRep.NewApplicationGormRepoImpl(dbconn)
+	// appServi := appServ.NewApplicationServiceImpl(appRepo)
 
 	intRepo := intRep.NewInternshipGormRepo(dbconn)
 	intServi := intServ.NewInternshipService(intRepo)
@@ -70,7 +69,7 @@ func main() {
 
 	usroleHandler := handler.NewUserRoleHandler(userroleServ)
 
-	appHandler := handler.NewApplicationHandler(appServi)
+	// appHandler := handler.NewApplicationHandler(appServi)
 
 	intHandler := handler.NewInternshipHandler(intServi)
 
@@ -97,6 +96,12 @@ func main() {
 	router.GET("/v1/users/:id", userHandler.GetSingleUser)
 	router.PUT("/v1/user/update/:id", userHandler.PutUser)
 	router.GET("/v1/companybyuserid/:id", compHandler.GetSingleCompanyByUserId)
+
+	router.GET("/v1/internships", intHandler.GetInternships)
+	router.GET("/v1/internship/:id", intHandler.GetSingleInternship)
+	router.POST("/v1/internship", intHandler.PostInternship)
+	router.PUT("/v1/internship/update/:id", intHandler.PutInternship)
+	router.DELETE("/v1/internship/delete/:id", intHandler.DeleteInternship)
 
 	http.ListenAndServe(":8181", router)
 

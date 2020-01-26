@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/WebProgrammingAAiT/intern-seek-web-project/entity"
-	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship"
+	"github.com/MahletH/intern-seek-RestAPI/entity"
+	"github.com/MahletH/intern-seek-RestAPI/internship"
 
 	"github.com/jinzhu/gorm"
 )

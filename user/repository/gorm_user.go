@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/abdimussa87/Intern-Seek-Version-1/entity"
-	"github.com/abdimussa87/Intern-Seek-Version-1/user"
+	"github.com/MahletH/intern-seek-RestAPI/entity"
+	"github.com/MahletH/intern-seek-RestAPI/user"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )

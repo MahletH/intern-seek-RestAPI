@@ -4,9 +4,9 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/WebProgrammingAAiT/intern-seek-web-project/handler"
-	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship/repository"
-	"github.com/WebProgrammingAAiT/intern-seek-web-project/internship/service"
+	"github.com/MahletH/intern-seek-RestAPI/handler"
+	"github.com/MahletH/intern-seek-RestAPI/internship/repository"
+	"github.com/MahletH/intern-seek-RestAPI/internship/service"
 
 	"github.com/julienschmidt/httprouter"
 
