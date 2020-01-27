@@ -8,18 +8,20 @@ import (
 
 	"github.com/MahletH/intern-seek-RestAPI/entity"
 	"github.com/MahletH/intern-seek-RestAPI/internship"
+	"github.com/MahletH/intern-seek-RestAPI/user"
 	"github.com/julienschmidt/httprouter"
 )
 
 // InternshipHandler handles comment related http requests
 type InternshipHandler struct {
 	internshipService internship.InternshipService
+	companyService    user.CompanyService
 	//fieldService internship.FieldService
 }
 
 // NewInternshipHandler returns new AdminCommentHandler object
-func NewInternshipHandler(intrnService internship.InternshipService) *InternshipHandler {
-	return &InternshipHandler{internshipService: intrnService}
+func NewInternshipHandler(intrnService internship.InternshipService, compService user.CompanyService) *InternshipHandler {
+	return &InternshipHandler{internshipService: intrnService, companyService: compService}
 }
 
 // GetInternships handles GET /internship requests
@@ -33,6 +35,48 @@ func (ih *InternshipHandler) GetInternships(w http.ResponseWriter,
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+
+	output, err := json.MarshalIndent(internship, "", "\t\t") //marshal indent indents by given text -> two tabs
+	//marshal takes object and returns json?
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+}
+
+// GetCompanyInternships handles GET company/:company_id/internship requests
+func (ih *InternshipHandler) GetCompanyInternships(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	id, err := strconv.Atoi(ps.ByName("company_id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	company, errs := ih.companyService.GetCompanyByUserId(uint(id))
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	internship := company.Internships
+	// internship, errs := ih.internshipService.CompanyInternships(company)
+
+	// if len(errs) > 0 {
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	// 	return
+	// }
 
 	output, err := json.MarshalIndent(internship, "", "\t\t") //marshal indent indents by given text -> two tabs
 	//marshal takes object and returns json?

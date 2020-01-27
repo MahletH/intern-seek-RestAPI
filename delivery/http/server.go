@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
+	// "github.com/MahletH/intern-seek-RestAPI/entity"
 	// appRep "github.com/MahletH/intern-seek-RestAPI/application/repository"
 	// appServ "github.com/MahletH/intern-seek-RestAPI/application/service"
 	"github.com/MahletH/intern-seek-RestAPI/delivery/http/handler"
@@ -71,7 +72,7 @@ func main() {
 
 	// appHandler := handler.NewApplicationHandler(appServi)
 
-	intHandler := handler.NewInternshipHandler(intServi)
+	intHandler := handler.NewInternshipHandler(intServi, compServ)
 
 	signUpHandler := handler.NewSignUpHandler(userServi)
 	signInHandler := handler.NewSignInHandler(userServi, userroleServ)
@@ -99,6 +100,9 @@ func main() {
 
 	router.GET("/v1/internships", intHandler.GetInternships)
 	router.GET("/v1/internship/:id", intHandler.GetSingleInternship)
+
+	router.GET("/v1/companyInternship/:company_id/internships", intHandler.GetCompanyInternships)
+
 	router.POST("/v1/internship", intHandler.PostInternship)
 	router.PUT("/v1/internship/update/:id", intHandler.PutInternship)
 	router.DELETE("/v1/internship/delete/:id", intHandler.DeleteInternship)

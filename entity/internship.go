@@ -5,7 +5,7 @@ import "time"
 // Internship is a struct with all properties of an internship
 type Internship struct {
 	ID                    uint
-	CompanyID             uint      `json:"company_id"`
+	CompanyID             uint      `json:"company_id" sql:"type:int REFERENCES company_details(ID)"`
 	Name                  string    `json:"name" gorm:"type:varchar(255)"`
 	RequiredAcademicLevel string    `json:"required_academic_level" gorm:"type:varchar(255)"`
 	Description           string    `json:"description"`

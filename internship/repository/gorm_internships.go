@@ -40,8 +40,13 @@ func (igr *InternshipGormRepo) Internships() ([]entity.Internship, []error) {
 }
 
 //CompanyInternships returns internships under a company
-func (igr *InternshipGormRepo) CompanyInternships(compID uint) ([]entity.Internship, []error) {
-	return nil, nil
+func (igr *InternshipGormRepo) CompanyInternships(company *entity.CompanyDetail) ([]entity.Internship, []error) {
+	compInterns := []entity.Internship{}
+	errs := igr.conn.Model(company).Related(&compInterns, "Internships").GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return compInterns, errs
 }
 
 // Internship finds an internship with a given id

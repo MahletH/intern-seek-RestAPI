@@ -29,10 +29,13 @@ func (compRepo *CompanyGormRepo) Companies() ([]entity.CompanyDetail, []error) {
 // Company retrieves a company_detail by its id from the database
 func (compRepo *CompanyGormRepo) Company(id uint) (*entity.CompanyDetail, []error) {
 	company := entity.CompanyDetail{}
+	intern := []entity.Internship{}
 	errs := compRepo.conn.First(&company, id).GetErrors()
+	errs = compRepo.conn.Where("company_id = ?", company.ID).Find(&intern).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
 	}
+	company.Internships = intern
 	return &company, errs
 }
 
@@ -40,9 +43,12 @@ func (compRepo *CompanyGormRepo) Company(id uint) (*entity.CompanyDetail, []erro
 func (compRepo *CompanyGormRepo) GetCompanyByUserId(id uint) (*entity.CompanyDetail, []error) {
 	company := entity.CompanyDetail{}
 	errs := compRepo.conn.Where("user_id=?", id).First(&company).GetErrors()
+	intern := []entity.Internship{}
+	errs = compRepo.conn.Where("company_id = ?", company.ID).Find(&intern).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
 	}
+	company.Internships = intern
 	return &company, errs
 }
 
