@@ -29,7 +29,8 @@ type UserRoleService interface {
 type InternService interface {
 	StoreIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
 	UpdateIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
-	DeleteIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
+	DeleteIntern(id uint)(*entity.PersonalDetails,[]error)
 	Interns()([]entity.PersonalDetails,[]error)
 	Intern(id uint)(*entity.PersonalDetails,[]error)
+	GetInternByUserId(id uint) (*entity.PersonalDetails, []error)
 }
