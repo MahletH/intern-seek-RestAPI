@@ -20,13 +20,19 @@ func NewInternshipGormRepo(db *gorm.DB) internship.InternshipRepository {
 // Internships returns a list of all available interships
 func (igr *InternshipGormRepo) Internships() ([]entity.Internship, []error) {
 	intern := []entity.Internship{}
+	fieldIDs := []entity.FieldOfStudyRequired{}
 	field := []entity.Fields{}
 	errs := igr.conn.Find(&intern).GetErrors() //pass container for result to Find()
 	count := len(intern)
 
 	for i := 0; i < count; i++ {
-		errs := igr.conn.Where("internship_id = ?", intern[i].ID).Find(&field).GetErrors()
-		intern[i].FieldsReq = field
+		errs = igr.conn.Where("internship_id = ?", intern[i].ID).Find(&fieldIDs).GetErrors()
+		for _, value := range fieldIDs {
+			errs = igr.conn.Where("id = ?", value.FieldID).Find(&fields).GetErrors()
+
+		}
+
+		intern[i].FieldsReq = fields
 		if len(errs) != 0 {
 			return nil, errs
 		}
@@ -39,19 +45,21 @@ func (igr *InternshipGormRepo) Internships() ([]entity.Internship, []error) {
 	return intern, errs
 }
 
-//CompanyInternships returns internships under a company
-func (igr *InternshipGormRepo) CompanyInternships(compID uint) ([]entity.Internship, []error) {
-	return nil, nil
-}
-
 // Internship finds an internship with a given id
 func (igr *InternshipGormRepo) Internship(id uint) (*entity.Internship, []error) {
 	intern := entity.Internship{}
-	field := []entity.Fields{}
+	fieldIDs := []entity.FieldOfStudyRequired{}
+	fields := []entity.Fields{}
 
 	errs := igr.conn.First(&intern, id).GetErrors()
-	errs = igr.conn.Where("internship_id = ?", intern.ID).Find(&field).GetErrors()
-	intern.FieldsReq = field
+	errs = igr.conn.Where("internship_id = ?", intern.ID).Find(&fieldIDs).GetErrors()
+	for _, value := range fieldIDs {
+		errs = igr.conn.Where("id = ?", value.FieldID).Find(&fields).GetErrors()
+
+	}
+
+	intern.FieldsReq = fields
+
 	if len(errs) != 0 {
 		return nil, errs
 	}
