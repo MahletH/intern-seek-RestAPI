@@ -32,4 +32,5 @@ type InternRepository interface {
 	DeleteIntern(id uint) (*entity.PersonalDetails, []error)
 	Interns() ([]entity.PersonalDetails, []error)
 	Intern(id uint) (*entity.PersonalDetails, []error)
+	GetInternByUserId(id uint) (*entity.PersonalDetails, []error)
 }
