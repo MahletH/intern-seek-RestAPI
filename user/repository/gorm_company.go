@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/MahletH/intern-seek-RestAPI/entity"
-	"github.com/MahletH/intern-seek-RestAPI/user"
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/user"
 	"github.com/jinzhu/gorm"
 )
 
@@ -19,7 +19,16 @@ func NewCompanyGormRepoImpl(db *gorm.DB) user.CompanyRepository {
 // Companies return all company_details from the database
 func (compRepo *CompanyGormRepo) Companies() ([]entity.CompanyDetail, []error) {
 	companies := []entity.CompanyDetail{}
+	intern := []entity.Internship{}
 	errs := compRepo.conn.Find(&companies).GetErrors()
+	count := len(companies)
+	for i := 0; i < count; i++ {
+		errs = compRepo.conn.Where("company_id = ?", companies[i].ID).Find(&intern).GetErrors()
+		if len(errs) > 0 {
+			return nil, errs
+		}
+		companies[i].Internships = intern
+	}
 	if len(errs) > 0 {
 		return nil, errs
 	}
@@ -29,10 +38,13 @@ func (compRepo *CompanyGormRepo) Companies() ([]entity.CompanyDetail, []error) {
 // Company retrieves a company_detail by its id from the database
 func (compRepo *CompanyGormRepo) Company(id uint) (*entity.CompanyDetail, []error) {
 	company := entity.CompanyDetail{}
+	intern := []entity.Internship{}
 	errs := compRepo.conn.First(&company, id).GetErrors()
+	errs = compRepo.conn.Where("company_id = ?", company.ID).Find(&intern).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
 	}
+	company.Internships = intern
 	return &company, errs
 }
 
@@ -40,9 +52,12 @@ func (compRepo *CompanyGormRepo) Company(id uint) (*entity.CompanyDetail, []erro
 func (compRepo *CompanyGormRepo) GetCompanyByUserId(id uint) (*entity.CompanyDetail, []error) {
 	company := entity.CompanyDetail{}
 	errs := compRepo.conn.Where("user_id=?", id).First(&company).GetErrors()
+	intern := []entity.Internship{}
+	errs = compRepo.conn.Where("company_id = ?", company.ID).Find(&intern).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
 	}
+	company.Internships = intern
 	return &company, errs
 }
 

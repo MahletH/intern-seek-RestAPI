@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/MahletH/intern-seek-RestAPI/entity"
-	"github.com/MahletH/intern-seek-RestAPI/internship"
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/internship"
 )
 
 // InternshipService implements menu.CommentService interface
@@ -62,4 +62,13 @@ func (is *InternshipService) StoreInternship(internship *entity.Internship) (*en
 		return nil, errs
 	}
 	return intern, errs
+}
+
+// CompanyInternships returns all orders of a given customer
+func (is *InternshipService) CompanyInternships(company *entity.CompanyDetail) ([]entity.Internship, []error) {
+	interns, errs := is.internshipRepo.CompanyInternships(company)
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return interns, errs
 }

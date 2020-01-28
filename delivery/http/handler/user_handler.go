@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/MahletH/intern-seek-RestAPI/user"
+	"github.com/abdimussa87/intern-seek-RestAPI/user"
 	"github.com/julienschmidt/httprouter"
 )
 

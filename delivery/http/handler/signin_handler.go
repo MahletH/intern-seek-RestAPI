@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/MahletH/intern-seek-RestAPI/entity"
-	"github.com/MahletH/intern-seek-RestAPI/user"
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/user"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 )
@@ -52,7 +52,7 @@ func (sih *SignInHandler) SignIn(w http.ResponseWriter, r *http.Request, _ httpr
 		return
 	}
 
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(30 * time.Minute)
 	claim := &Claims{
 		UserID: usr.ID,
 		Role:   role.Role,

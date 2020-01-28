@@ -6,26 +6,25 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/abdimussa87/intern-seek-RestAPI/application"
-
 	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/field"
 	"github.com/julienschmidt/httprouter"
 )
 
-type ApplicationHandler struct {
-	applicationService application.ApplicationService
+type FieldHandler struct {
+	fieldService field.FieldService
 }
 
-func NewApplicationHandler(appSrv application.ApplicationService) *ApplicationHandler {
+func NewFieldHandler(fldSrv field.FieldService) *FieldHandler {
 
-	return &ApplicationHandler{applicationService: appSrv}
+	return &FieldHandler{fieldService: fldSrv}
 }
 
-//GetCompanies handles GET?v1/admin/roles requests
-func (ah *ApplicationHandler) GetApplications(w http.ResponseWriter,
+//GetFields handles GET?v1/fields requests
+func (fh *FieldHandler) GetFields(w http.ResponseWriter,
 	r *http.Request, _ httprouter.Params) {
 
-	apps, errs := ah.applicationService.Applications()
+	fields, errs := fh.fieldService.Fields()
 
 	if len(errs) > 0 {
 
@@ -35,7 +34,7 @@ func (ah *ApplicationHandler) GetApplications(w http.ResponseWriter,
 
 	}
 
-	output, err := json.MarshalIndent(apps, "", "\t\t")
+	output, err := json.MarshalIndent(fields, "", "\t\t")
 
 	if err != nil {
 
@@ -50,8 +49,8 @@ func (ah *ApplicationHandler) GetApplications(w http.ResponseWriter,
 
 }
 
-//GetSingleRoles handles GET/v1/admin/roles/:id  requests
-func (ah *ApplicationHandler) GetSingleApplication(w http.ResponseWriter,
+//GetSingleField handles GET/v1/field/:id  requests
+func (fh *FieldHandler) GetSingleField(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -62,7 +61,7 @@ func (ah *ApplicationHandler) GetSingleApplication(w http.ResponseWriter,
 		return
 	}
 
-	app, errs := ah.applicationService.Application(uint(id))
+	field, errs := fh.fieldService.Field(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -70,7 +69,7 @@ func (ah *ApplicationHandler) GetSingleApplication(w http.ResponseWriter,
 		return
 	}
 
-	output, err := json.MarshalIndent(app, "", "\t\t")
+	output, err := json.MarshalIndent(field, "", "\t\t")
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -84,7 +83,7 @@ func (ah *ApplicationHandler) GetSingleApplication(w http.ResponseWriter,
 
 }
 
-func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
+func (fh *FieldHandler) PutField(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -94,7 +93,7 @@ func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
 		return
 	}
 
-	app, errs := ah.applicationService.Application(uint(id))
+	field, errs := fh.fieldService.Field(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -110,9 +109,9 @@ func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
 
 	r.Body.Read(body)
 
-	json.Unmarshal(body, &app)
+	json.Unmarshal(body, &field)
 
-	app, errs = ah.applicationService.UpdateApplication(app)
+	field, errs = fh.fieldService.UpdateField(field)
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -120,7 +119,7 @@ func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
 		return
 	}
 
-	output, err := json.MarshalIndent(app, "", "\t\t")
+	output, err := json.MarshalIndent(field, "", "\t\t")
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -134,37 +133,50 @@ func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
 
 }
 
-func (ah *ApplicationHandler) PostApplication(w http.ResponseWriter,
+//TO DO change ps to not get fieldid
+func (fh *FieldHandler) PostField(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	l := r.ContentLength
 	body := make([]byte, l)
 	r.Body.Read(body)
-	app := &entity.Application{}
+	field := &entity.Field{}
 
-	err := json.Unmarshal(body, app)
+	err := json.Unmarshal(body, field)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	app, errs := ah.applicationService.StoreApplication(app)
 
-	if errs != nil {
+	field, errs := fh.fieldService.StoreField(field)
+
+	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
-	p := fmt.Sprintf("/v1/admin/application/%d", app.ID)
+	output, err := json.MarshalIndent(field, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+
+	p := fmt.Sprintf("/v1/field/%d", field.ID)
 	w.Header().Set("Location", p)
 	w.WriteHeader(http.StatusCreated)
 	return
 
 }
 
-func (ah *ApplicationHandler) DeleteApplication(w http.ResponseWriter,
+func (fh *FieldHandler) DeleteField(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -175,7 +187,7 @@ func (ah *ApplicationHandler) DeleteApplication(w http.ResponseWriter,
 		return
 	}
 
-	_, errs := ah.applicationService.DeleteApplication(uint(id))
+	_, errs := fh.fieldService.DeleteField(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")

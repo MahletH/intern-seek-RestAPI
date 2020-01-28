@@ -9,4 +9,5 @@ type CompanyDetail struct {
 	City        string `gorm:"type:varchar(255);not null"`
 	FocusArea   string `gorm:"type:varchar(255);not null"`
 	Description string `gorm:"type:varchar(255)"`
+	Internships []Internship
 }

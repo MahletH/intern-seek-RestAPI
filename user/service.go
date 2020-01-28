@@ -1,6 +1,6 @@
 package user
 
-import "github.com/MahletH/intern-seek-RestAPI/entity"
+import "github.com/abdimussa87/intern-seek-RestAPI/entity"
 
 //UserService specifies user related services
 type UserService interface {
@@ -27,9 +27,11 @@ type UserRoleService interface {
 	StoreUserRole(role *entity.UserRole) (*entity.UserRole, []error)
 }
 type InternService interface {
-	StoreIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
-	UpdateIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
-	DeleteIntern(intern *entity.PersonalDetails)(*entity.PersonalDetails,[]error)
-	Interns()([]entity.PersonalDetails,[]error)
-	Intern(id uint)(*entity.PersonalDetails,[]error)
+	StoreIntern(intern *entity.PersonalDetails) (*entity.PersonalDetails, []error)
+	UpdateIntern(intern *entity.PersonalDetails) (*entity.PersonalDetails, []error)
+	DeleteIntern(id uint) (*entity.PersonalDetails, []error)
+	Interns() ([]entity.PersonalDetails, []error)
+	Intern(id uint) (*entity.PersonalDetails, []error)
+	GetInternByUserId(id uint) (*entity.PersonalDetails, []error)
+	InternFields(intern *entity.PersonalDetails) ([]entity.Field, []error)
 }

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/MahletH/intern-seek-RestAPI/entity"
-	"github.com/MahletH/intern-seek-RestAPI/user"
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/user"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -65,8 +65,11 @@ func (userRepo *UserGormRepo) User(id uint) (*entity.User, []error) {
 // UpdateUser updates a given user in the database
 func (userRepo *UserGormRepo) UpdateUser(user *entity.User) (*entity.User, []error) {
 	usr := user
-	fmt.Printf("User id equal %d", int(usr.ID))
-	errs := userRepo.conn.Save(usr).GetErrors()
+	fmt.Printf("User id equals on update user %d", int(usr.ID))
+	usrInDB, errs := userRepo.User(usr.ID)
+	usr.Password = usrInDB.Password
+	errs = userRepo.conn.Save(usr).GetErrors()
+
 	if len(errs) > 0 {
 		return nil, errs
 	}

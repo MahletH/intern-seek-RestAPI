@@ -7,25 +7,24 @@ import (
 	"strconv"
 
 	"github.com/abdimussa87/intern-seek-RestAPI/application"
-
 	"github.com/abdimussa87/intern-seek-RestAPI/entity"
 	"github.com/julienschmidt/httprouter"
 )
 
-type ApplicationHandler struct {
-	applicationService application.ApplicationService
+type StatusHandler struct {
+	statusService application.StatusService
 }
 
-func NewApplicationHandler(appSrv application.ApplicationService) *ApplicationHandler {
+func NewStatusHandler(statSrv application.StatusService) *StatusHandler {
 
-	return &ApplicationHandler{applicationService: appSrv}
+	return &StatusHandler{statusService: statSrv}
 }
 
-//GetCompanies handles GET?v1/admin/roles requests
-func (ah *ApplicationHandler) GetApplications(w http.ResponseWriter,
+//GetStatus handles GET?v1/status requests
+func (sh *StatusHandler) GetStatus(w http.ResponseWriter,
 	r *http.Request, _ httprouter.Params) {
 
-	apps, errs := ah.applicationService.Applications()
+	statuses, errs := sh.statusService.Statuses()
 
 	if len(errs) > 0 {
 
@@ -35,7 +34,7 @@ func (ah *ApplicationHandler) GetApplications(w http.ResponseWriter,
 
 	}
 
-	output, err := json.MarshalIndent(apps, "", "\t\t")
+	output, err := json.MarshalIndent(statuses, "", "\t\t")
 
 	if err != nil {
 
@@ -50,8 +49,8 @@ func (ah *ApplicationHandler) GetApplications(w http.ResponseWriter,
 
 }
 
-//GetSingleRoles handles GET/v1/admin/roles/:id  requests
-func (ah *ApplicationHandler) GetSingleApplication(w http.ResponseWriter,
+//GetSingleStatus handles GET/v1/status/:id  requests
+func (sh *StatusHandler) GetSingleHandler(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -62,7 +61,7 @@ func (ah *ApplicationHandler) GetSingleApplication(w http.ResponseWriter,
 		return
 	}
 
-	app, errs := ah.applicationService.Application(uint(id))
+	status, errs := sh.statusService.Status(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -70,7 +69,7 @@ func (ah *ApplicationHandler) GetSingleApplication(w http.ResponseWriter,
 		return
 	}
 
-	output, err := json.MarshalIndent(app, "", "\t\t")
+	output, err := json.MarshalIndent(status, "", "\t\t")
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -84,7 +83,7 @@ func (ah *ApplicationHandler) GetSingleApplication(w http.ResponseWriter,
 
 }
 
-func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
+func (sh *StatusHandler) PutStatus(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -94,7 +93,7 @@ func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
 		return
 	}
 
-	app, errs := ah.applicationService.Application(uint(id))
+	status, errs := sh.statusService.Status(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -110,9 +109,9 @@ func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
 
 	r.Body.Read(body)
 
-	json.Unmarshal(body, &app)
+	json.Unmarshal(body, &status)
 
-	app, errs = ah.applicationService.UpdateApplication(app)
+	status, errs = sh.statusService.UpdateStatus(status)
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
@@ -120,7 +119,7 @@ func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
 		return
 	}
 
-	output, err := json.MarshalIndent(app, "", "\t\t")
+	output, err := json.MarshalIndent(status, "", "\t\t")
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -134,37 +133,49 @@ func (ah *ApplicationHandler) PutApplication(w http.ResponseWriter,
 
 }
 
-func (ah *ApplicationHandler) PostApplication(w http.ResponseWriter,
+func (sh *StatusHandler) PostCompany(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	l := r.ContentLength
 	body := make([]byte, l)
 	r.Body.Read(body)
-	app := &entity.Application{}
+	status := &entity.Status{}
 
-	err := json.Unmarshal(body, app)
+	err := json.Unmarshal(body, status)
 
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	app, errs := ah.applicationService.StoreApplication(app)
 
-	if errs != nil {
+	status, errs := sh.statusService.StoreStatus(status)
+
+	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
-	p := fmt.Sprintf("/v1/admin/application/%d", app.ID)
+	output, err := json.MarshalIndent(status, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	p := fmt.Sprintf("/v1/company/%d", status.ID)
 	w.Header().Set("Location", p)
 	w.WriteHeader(http.StatusCreated)
+	w.Write(output)
 	return
 
 }
 
-func (ah *ApplicationHandler) DeleteApplication(w http.ResponseWriter,
+func (sh *StatusHandler) DeleteStatus(w http.ResponseWriter,
 	r *http.Request, ps httprouter.Params) {
 
 	id, err := strconv.Atoi(ps.ByName("id"))
@@ -175,7 +186,7 @@ func (ah *ApplicationHandler) DeleteApplication(w http.ResponseWriter,
 		return
 	}
 
-	_, errs := ah.applicationService.DeleteApplication(uint(id))
+	_, errs := sh.statusService.DeleteStatus(uint(id))
 
 	if len(errs) > 0 {
 		w.Header().Set("Content-Type", "application/json")

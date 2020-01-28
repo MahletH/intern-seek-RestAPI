@@ -10,6 +10,7 @@ type Intern struct {
 	// Field         string
 	// AcademicLevel string
 
-	InterDetail PersonalDetails
-	InternUser  User
+	InternDetail   PersonalDetails
+	InternUser     User
+	AvailableField []Field
 }
