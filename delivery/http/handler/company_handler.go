@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/MahletH/intern-seek-RestAPI/entity"
-	"github.com/MahletH/intern-seek-RestAPI/user"
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/user"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -201,11 +201,11 @@ func (ch *Companyhandler) PostCompany(w http.ResponseWriter,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(output)
 
 	p := fmt.Sprintf("/v1/company/%d", company.ID)
 	w.Header().Set("Location", p)
 	w.WriteHeader(http.StatusCreated)
+	w.Write(output)
 	return
 
 }

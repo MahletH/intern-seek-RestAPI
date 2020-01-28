@@ -1,6 +1,6 @@
 package user
 
-import "github.com/MahletH/intern-seek-RestAPI/entity"
+import "github.com/abdimussa87/intern-seek-RestAPI/entity"
 
 // UserRepository specifies user related database operations
 type UserRepository interface {
@@ -32,4 +32,6 @@ type InternRepository interface {
 	DeleteIntern(id uint) (*entity.PersonalDetails, []error)
 	Interns() ([]entity.PersonalDetails, []error)
 	Intern(id uint) (*entity.PersonalDetails, []error)
+	GetInternByUserId(id uint) (*entity.PersonalDetails, []error)
+	InternFields(intern *entity.PersonalDetails) ([]entity.Field, []error)
 }

@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/MahletH/intern-seek-RestAPI/entity"
-	"github.com/MahletH/intern-seek-RestAPI/internship"
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/internship"
 
 	"github.com/jinzhu/gorm"
 )
@@ -20,14 +20,14 @@ func NewInternshipGormRepo(db *gorm.DB) internship.InternshipRepository {
 // Internships returns a list of all available interships
 func (igr *InternshipGormRepo) Internships() ([]entity.Internship, []error) {
 	intern := []entity.Internship{}
-	field := []entity.Fields{}
+	field := []entity.Field{}
 	errs := igr.conn.Find(&intern).GetErrors() //pass container for result to Find()
 	count := len(intern)
 
 	for i := 0; i < count; i++ {
-		errs := igr.conn.Where("internship_id = ?", intern[i].ID).Find(&field).GetErrors()
+		errs := igr.conn.Model(intern[i]).Related(&field, "FieldsReq").GetErrors()
 		intern[i].FieldsReq = field
-		if len(errs) != 0 {
+		if len(errs) > 0 {
 			return nil, errs
 		}
 	}
@@ -40,21 +40,28 @@ func (igr *InternshipGormRepo) Internships() ([]entity.Internship, []error) {
 }
 
 //CompanyInternships returns internships under a company
-func (igr *InternshipGormRepo) CompanyInternships(compID uint) ([]entity.Internship, []error) {
-	return nil, nil
+func (igr *InternshipGormRepo) CompanyInternships(company *entity.CompanyDetail) ([]entity.Internship, []error) {
+	compInterns := []entity.Internship{}
+	errs := igr.conn.Model(company).Related(&compInterns, "FieldsReq").GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return compInterns, errs
 }
 
 // Internship finds an internship with a given id
 func (igr *InternshipGormRepo) Internship(id uint) (*entity.Internship, []error) {
 	intern := entity.Internship{}
-	field := []entity.Fields{}
+	field := []entity.Field{}
 
 	errs := igr.conn.First(&intern, id).GetErrors()
-	errs = igr.conn.Where("internship_id = ?", intern.ID).Find(&field).GetErrors()
+	errs = igr.conn.Model(intern).Related(&field, "FieldsReq").GetErrors()
 	intern.FieldsReq = field
-	if len(errs) != 0 {
-		return nil, errs
-	}
+	// errs = igr.conn.Where("internship_id = ?", intern.ID).Find(&field).GetErrors()
+	// intern.FieldsReq = field
+	// if len(errs) != 0 {
+	// 	return nil, errs
+	// }
 	if len(errs) > 0 {
 		return nil, errs
 	}
@@ -74,12 +81,6 @@ func (igr *InternshipGormRepo) UpdateInternship(internship *entity.Internship) (
 // DeleteInternship deletes a given internship
 func (igr *InternshipGormRepo) DeleteInternship(id uint) (*entity.Internship, []error) {
 	intern, errs := igr.Internship(id)
-	field := []entity.Fields{}
-
-	errs = igr.conn.Where("internship_id = ?", id).Delete(&field).GetErrors()
-	if len(errs) > 0 {
-		return nil, errs
-	}
 	errs = igr.conn.Delete(intern, id).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs

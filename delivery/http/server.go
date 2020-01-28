@@ -6,16 +6,21 @@ import (
 
 	// appRep "github.com/MahletH/intern-seek-RestAPI/application/repository"
 	// appServ "github.com/MahletH/intern-seek-RestAPI/application/service"
-	"github.com/MahletH/intern-seek-RestAPI/delivery/http/handler"
-	intRep "github.com/MahletH/intern-seek-RestAPI/internship/repository"
-	intServ "github.com/MahletH/intern-seek-RestAPI/internship/service"
-	"github.com/MahletH/intern-seek-RestAPI/user/repository"
-	userRep "github.com/MahletH/intern-seek-RestAPI/user/repository"
+	"github.com/abdimussa87/intern-seek-RestAPI/delivery/http/handler"
+	intRep "github.com/abdimussa87/intern-seek-RestAPI/internship/repository"
+	intServ "github.com/abdimussa87/intern-seek-RestAPI/internship/service"
+	"github.com/abdimussa87/intern-seek-RestAPI/user/repository"
+	internRep "github.com/abdimussa87/intern-seek-RestAPI/user/repository"
+	userRep "github.com/abdimussa87/intern-seek-RestAPI/user/repository"
+
+	fldRep "github.com/abdimussa87/intern-seek-RestAPI/field/repository"
+	fldServ "github.com/abdimussa87/intern-seek-RestAPI/field/service"
 	"github.com/jinzhu/gorm"
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/MahletH/intern-seek-RestAPI/user/service"
-	userServ "github.com/MahletH/intern-seek-RestAPI/user/service"
+	"github.com/abdimussa87/intern-seek-RestAPI/user/service"
+	internServ "github.com/abdimussa87/intern-seek-RestAPI/user/service"
+	userServ "github.com/abdimussa87/intern-seek-RestAPI/user/service"
 
 	_ "github.com/lib/pq"
 )
@@ -34,15 +39,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	dbconn, err := gorm.Open("postgres", "user=postgres dbname=interndb password='1234' sslmode=disable")
+	dbconn, err := gorm.Open("postgres", "user=postgres dbname=gorminterndb password='P@$$wOrDd' sslmode=disable")
 
 	if err != nil {
 		panic(err)
 	}
 
 	defer dbconn.Close()
-	// dbconn.DropTableIfExists(&entity.UserRole{}, &entity.CompanyDetail{}, &entity.User{})
-	// errs := dbconn.CreateTable(&entity.User{}, &entity.UserRole{}, &entity.CompanyDetail{}).GetErrors()
+	// dbconn.DropTableIfExists(&entity.Field{})
+	// errs := dbconn.CreateTable(&entity.Internship{}).GetErrors()
 
 	// if len(errs) > 0 {
 	// 	panic(errs)
@@ -67,14 +72,25 @@ func main() {
 	userroleRepo := userRep.NewUserRoleGormRepo(dbconn)
 	userroleServ := userServ.NewUserRoleService(userroleRepo)
 
+	internRepo := internRep.NewInternGormRepoImpl(dbconn)
+	internServi := internServ.NewInternService(internRepo)
+
+	internHandler := handler.NewInternHandler(internServi)
 	usroleHandler := handler.NewUserRoleHandler(userroleServ)
+
+	fieldRepo := fldRep.NewFieldGormRepo(dbconn)
+	fieldServi := fldServ.NewFieldService(fieldRepo)
+
+	fldHandler := handler.NewFieldHandler(fieldServi)
 
 	// appHandler := handler.NewApplicationHandler(appServi)
 
-	intHandler := handler.NewInternshipHandler(intServi)
+	intHandler := handler.NewInternshipHandler(intServi, compServ)
 
 	signUpHandler := handler.NewSignUpHandler(userServi)
 	signInHandler := handler.NewSignInHandler(userServi, userroleServ)
+
+	srcHandler := handler.NewSearchHandler(fieldServi)
 
 	router := httprouter.New()
 
@@ -83,6 +99,7 @@ func main() {
 
 	//Protected route
 
+	router.GET("/v1/field/:id/internship", srcHandler.GetInternshipsbyFieldName)
 	router.POST("/v1/userrole", usroleHandler.PostUserRole)
 
 	router.GET("/v1/userrole/:id", usroleHandler.GetSingleUserRole)
@@ -97,11 +114,25 @@ func main() {
 	router.PUT("/v1/user/update/:id", userHandler.PutUser)
 	router.GET("/v1/companybyuserid/:id", compHandler.GetSingleCompanyByUserId)
 
+	router.GET("/v1/intern", internHandler.GetInterns)
+	router.GET("/v1/intern/:id", internHandler.GetSingleIntern)
+	router.POST("/v1/intern", internHandler.PostIntern)
+	router.PUT("/v1/intern/update/:id", internHandler.PutIntern)
+	router.DELETE("/v1/intern/delete/:id", internHandler.DeleteIntern)
+	router.GET("/v1/internbyuser/:id", internHandler.GetSingleInternByUserId)
+
+	router.GET("/v1/field", fldHandler.GetFields)
+	router.GET("/v1/field/:id", fldHandler.GetSingleField)
+	router.POST("/v1/field", fldHandler.PostField)
+	router.PUT("/v1/field/update/:id", fldHandler.PutField)
+	router.DELETE("/v1/field/delete/:id", fldHandler.DeleteField)
+
 	router.GET("/v1/internships", intHandler.GetInternships)
 	router.GET("/v1/internship/:id", intHandler.GetSingleInternship)
 	router.POST("/v1/internship", intHandler.PostInternship)
 	router.PUT("/v1/internship/update/:id", intHandler.PutInternship)
 	router.DELETE("/v1/internship/delete/:id", intHandler.DeleteInternship)
+	router.GET("/v1/companyInternship/:company_id/internships", intHandler.GetCompanyInternships)
 
 	http.ListenAndServe(":8181", router)
 

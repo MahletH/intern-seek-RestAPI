@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/MahletH/intern-seek-RestAPI/application"
-	"github.com/MahletH/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/application"
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
 )
 
 //ApplicationServiceImpl implements application.Applicationservice interface

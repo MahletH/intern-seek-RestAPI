@@ -1,34 +1,249 @@
 package handler
 
-// import (
-// 	"github.com/MahletH/intern-seek-RestAPI/user"
-// )
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
 
-// type UserHandler struct {
-// 	userServ user.UserService
-// }
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/user"
+	"github.com/julienschmidt/httprouter"
+)
 
-// func NewUserHandler(US user.UserService) *UserHandler {
-// 	return &UserHandler{userServ: US}
-// }
+type Internhandler struct {
+	internService user.InternService
+}
 
-// //SignUp handles requests coming at /signup
-// func (uh UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method == http.MethodPost {
-// 		user := entity.User{}
-// 		user.Name = r.FormValue("fullname")
-// 		// user.UUID = r.FormValue("username")
-// 		user.Email = r.FormValue("email")
-// 		user.Phone = r.FormValue("phone")
-// 		user.Password = r.FormValue("password")
+func NewInternHandler(intSrv user.InternService) *Internhandler {
 
-// 		err := uh.userServ.StoreUser(&user)
-// 		if err != nil {
-// 			panic(err)
-// 		}
+	return &Internhandler{internService: intSrv}
+}
 
-// 		http.Redirect(w, r, "/", http.StatusSeeOther)
-// 	} else if r.Method == http.MethodGet {
-// 		uh.t.ExecuteTemplate(w, "signup.html", nil)
-// 	}
-// }
+//GetInterns handles GET?v1/intern requests
+func (inh *Internhandler) GetInterns(w http.ResponseWriter,
+	r *http.Request, _ httprouter.Params) {
+
+	interns, errs := inh.internService.Interns()
+	for _, intern := range interns {
+		intFields, errs := inh.internService.InternFields(&intern)
+		if len(errs) > 0 {
+
+			w.Header().Set("Content-Type", "application/json")
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+
+		}
+		intern.Fields = intFields
+	}
+
+	if len(errs) > 0 {
+
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+
+	}
+
+	output, err := json.MarshalIndent(interns, "", "\t\t")
+
+	if err != nil {
+
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+
+}
+
+//GetSingleIntern handles GET/v1/intern/id  requests
+func (inh *Internhandler) GetSingleIntern(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	id, err := strconv.Atoi(ps.ByName("id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	intern, errs := inh.internService.Intern(uint(id))
+	intern.Fields, errs = inh.internService.InternFields(intern)
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	output, err := json.MarshalIndent(intern, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+
+}
+
+//GetSingleInternByUserId handles GET/v1/internbyuser/:id  requests
+func (inh *Internhandler) GetSingleInternByUserId(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	id, err := strconv.Atoi(ps.ByName("id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	intern, errs := inh.internService.GetInternByUserId(uint(id))
+	intern.Fields, errs = inh.internService.InternFields(intern)
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	output, err := json.MarshalIndent(intern, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+
+}
+
+func (inh *Internhandler) PutIntern(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	intern, errs := inh.internService.Intern(uint(id))
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+
+		return
+
+	}
+
+	l := r.ContentLength
+
+	body := make([]byte, l)
+
+	r.Body.Read(body)
+
+	json.Unmarshal(body, &intern)
+
+	intern, errs = inh.internService.UpdateIntern(intern)
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	output, err := json.MarshalIndent(intern, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+	return
+
+}
+
+//TO DO change ps to not get userid
+func (inh *Internhandler) PostIntern(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	l := r.ContentLength
+	body := make([]byte, l)
+	r.Body.Read(body)
+	intern := &entity.PersonalDetails{}
+
+	err := json.Unmarshal(body, intern)
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	intern, errs := inh.internService.StoreIntern(intern)
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	output, err := json.MarshalIndent(intern, "", "\t\t")
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+
+	p := fmt.Sprintf("/v1/company/%d", intern.ID)
+	w.Header().Set("Location", p)
+	w.WriteHeader(http.StatusCreated)
+	return
+
+}
+
+func (inh *Internhandler) DeleteIntern(w http.ResponseWriter,
+	r *http.Request, ps httprouter.Params) {
+
+	id, err := strconv.Atoi(ps.ByName("id"))
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	_, errs := inh.internService.DeleteIntern(uint(id))
+
+	if len(errs) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
+	return
+
+}

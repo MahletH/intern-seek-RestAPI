@@ -10,17 +10,11 @@ type Internship struct {
 	RequiredAcademicLevel string    `json:"required_academic_level" gorm:"type:varchar(255)"`
 	Description           string    `json:"description"`
 	ClosingDate           time.Time `json:"closing_date"`
-	FieldsReq             []Fields  `gorm:"one2many:fields"`
+	FieldsReq             []Field   `gorm:"many2many:internship_req_fields"`
 
 	//numOfInterns     int
 	//salary           float64
 
-}
-
-//Fields is a struct with all required fields under every internship
-type Fields struct {
-	InternshipID uint   `json:"internship_id"`
-	Field        string `json:"field" gorm:"type:varchar(255)"`
 }
 
 // Error represents error message

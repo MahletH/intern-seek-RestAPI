@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/MahletH/intern-seek-RestAPI/entity"
-	"github.com/MahletH/intern-seek-RestAPI/user"
+	"github.com/abdimussa87/intern-seek-RestAPI/entity"
+	"github.com/abdimussa87/intern-seek-RestAPI/user"
 	"github.com/jinzhu/gorm"
 )
 
@@ -38,12 +38,12 @@ func (internRepo InternGormRepo) UpdateIntern(intern *entity.PersonalDetails) (*
 }
 
 // DeleteIntern deletes a given personal_detail from the database
-func (internRepo *InternGormRepo) DeleteIntern(id uint) (*entity.PersonalDetails, []error) {
-	int, errs := internRepo.Intern(id)
+func (intRepo *InternGormRepo) DeleteIntern(id uint) (*entity.PersonalDetails, []error) {
+	int, errs := intRepo.Intern(id)
 	if len(errs) > 0 {
 		return nil, errs
 	}
-	errs = internRepo.conn.Delete(int, id).GetErrors()
+	errs = intRepo.conn.Delete(int, id).GetErrors()
 	if len(errs) > 0 {
 		return nil, errs
 	}
@@ -69,4 +69,24 @@ func (internRepo *InternGormRepo) Intern(id uint) (*entity.PersonalDetails, []er
 		return nil, errs
 	}
 	return &intern, errs
+}
+
+// GetInternByUserId retrieves a PersonalDetails by its user-id from the database
+func (intRepo *InternGormRepo) GetInternByUserId(id uint) (*entity.PersonalDetails, []error) {
+	intern := entity.PersonalDetails{}
+	errs := intRepo.conn.Where("user_id=?", id).First(&intern).GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+	return &intern, errs
+}
+
+func (intRepo *InternGormRepo) InternFields(intern *entity.PersonalDetails) ([]entity.Field, []error) {
+	fields := []entity.Field{}
+	errs := intRepo.conn.Model(intern).Related(&fields, "Fields").GetErrors()
+	if len(errs) > 0 {
+		return nil, errs
+	}
+
+	return fields, errs
 }
