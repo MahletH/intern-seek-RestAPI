@@ -1,0 +1,51 @@
+{{ define "internship.new.layout" }}
+{{ template "navbar" . }}
+{{ template "intenship.new.content" . }}
+{{ template "footer" . }}
+{{ end }}
+
+{{ define "internship.new.content"}}
+
+
+      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h2>Post New Internship</h2>
+        </div>
+        <div class="container">
+          <form method="POST" action=" " enctype="multipart/form-data">
+            <div class="form-group row">
+              <label for="name" class="col-sm-2 col-form-label">Internship Name</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="name" id="name" placeholder="Internship Name">
+              </div>
+            </div>
+            <div class="form-group row">
+                    <label for="name" class="col-sm-2 col-form-label">Required Academic Level</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" name="requiredAcademic" id="requiredAcademic" placeholder="Category Name">
+                    </div>
+            </div>            
+            <div class="form-group row">
+                    <label for="name" class="col-sm-2 col-form-label">Deadline</label>
+                    <div class="col-sm-10">
+                      <input type="date" class="form-control" name="deadline" id="deadline" >
+                    </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="description" class="col-sm-2 col-form-label">Description</label>
+              <div class="col-sm-10">
+                <textarea class="form-control" name="description" id="description" rows="3" placeholder="description"></textarea>
+              </div>
+            </div>
+            
+            <div class="form-group row">
+              <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary float-right">Add Internship</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </main>
+
+{{ end }}
